@@ -37,10 +37,11 @@ stages:
           archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
           includeRootFolder: false
           
-
       - task: PublishBuildArtifacts@1
         inputs:
-          artifactName: 'drop' 
+          PathtoPublish: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+          ArtifactName: 'drop'
+          publishLocation: 'Container'
 
       # the following will publish an artifact called drop 
 - stage: 'B'
