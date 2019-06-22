@@ -57,6 +57,7 @@ jobs:
 
 
   - task: AzureRmWebAppDeployment@4
+    displayName: 'Deploy to dev'
     inputs:
       ConnectionType: 'AzureRM'
       azureSubscription: 'pip-js-mre - Azure'
@@ -69,25 +70,25 @@ jobs:
 
   # test something, like UI Tests or something
 
+
+  # if dev successfully completes start deployment to prod
 - job: prod
   pool:
-    vmImage: 'ubuntu-16.04'
+    vmImage: 'vs2017-win2016'
   dependsOn: buildandtest
   condition: succeeded()
   steps:
 
   # step to download the artifacts from the previous job
-  - task: DownloadBuildArtifacts@0
-    inputs:
-      artifactName: drop
 
-  - task: AzureRmWebAppDeployment@3
+  - task: AzureRmWebAppDeployment@4
+    displayName: 'Deploy to production'
     inputs:
+      ConnectionType: 'AzureRM'
       azureSubscription: 'pip-js-mre - Azure'
+      appType: 'webApp'
       WebAppName: 'pip-js-mre'
-      Package: '$(System.DefaultWorkingDirectory)\**\drop\*.zip'
-      GenerateWebConfig: true
+      packageForLinux: '$(System.ArtifactsDirectory)/**/*.zip'
       WebConfigParameters: '-Handler iisnode -NodeStartFile server.js -appType node'
-      TakeAppOfflineFlag: true
-      UseWebDeploy: true
-      RenameFilesFlag: true
+      enableCustomDeployment: true
+      DeploymentType: 'webDeploy'
