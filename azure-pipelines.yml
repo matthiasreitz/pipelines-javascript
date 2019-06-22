@@ -32,16 +32,13 @@ jobs:
   - task: ArchiveFiles@2
     inputs:
       rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
+      archiveType: 'zip'
+      archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
       includeRootFolder: false
 
   - task: PublishBuildArtifacts@1
 
-  # the following will publish an artifact called drop
-  - task: DownloadBuildArtifacts@0
-    inputs:
-      artifactName: '\drop\*.zip' # Required when downloadType == Single
-      itemPattern: '**' # Optional
-      downloadPath: '$(System.ArtifactsDirectory)' 
+  # the following will publish an artifact called drop 
 
   - task: AzureRmWebAppDeployment@3
     displayName: 'Deploy Azure App Service'
