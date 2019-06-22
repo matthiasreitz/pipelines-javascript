@@ -1,121 +1,126 @@
-jobs:
+stages:
+- stage: A
+  jobs:
+    - job: buildandtest
+      pool:
+        vmImage: 'vs2017-win2016'
+      steps:
+      - task: NodeTool@0 
+        inputs:
+          versionSpec: '8.x'
 
-- job: buildandtest
-  pool:
-    vmImage: 'vs2017-win2016'
-  steps:
-  - task: NodeTool@0 
-    inputs:
-      versionSpec: '8.x'
+      - task: Npm@1
+        inputs:
+          command: 'install'
 
-  - task: Npm@1
-    inputs:
-      command: 'install'
+      - task: Npm@1
+        inputs:
+          command: 'custom'
+          customCommand: 'test'
 
-  - task: Npm@1
-    inputs:
-      command: 'custom'
-      customCommand: 'test'
+      - task: PublishTestResults@2
+        condition: succeededOrFailed()
+        inputs:
+          testRunner: JUnit
+          testResultsFiles: '**/TEST-RESULTS.xml'
 
-  - task: PublishTestResults@2
-    condition: succeededOrFailed()
-    inputs:
-      testRunner: JUnit
-      testResultsFiles: '**/TEST-RESULTS.xml'
+      - task: PublishCodeCoverageResults@1
+        inputs: 
+          codeCoverageTool: Cobertura
+          summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/*coverage.xml'
+          reportDirectory: '$(System.DefaultWorkingDirectory)/**/coverage'
 
-  - task: PublishCodeCoverageResults@1
-    inputs: 
-      codeCoverageTool: Cobertura
-      summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/*coverage.xml'
-      reportDirectory: '$(System.DefaultWorkingDirectory)/**/coverage'
+      - task: ArchiveFiles@2
+        inputs:
+          rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
+          archiveType: 'zip'
+          archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+          includeRootFolder: false
+          
 
-  - task: ArchiveFiles@2
-    inputs:
-      rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
-      archiveType: 'zip'
-      archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
-      includeRootFolder: false
-      
+      - task: PublishBuildArtifacts@1
+        inputs:
+          artifactName: 'drop' 
 
-  - task: PublishBuildArtifacts@1
-    inputs:
-      pathtoPublish: '$(Build.ArtifactStagingDirectory)' 
-      artifactName: 'drop' 
-
-  # the following will publish an artifact called drop 
-
-  # job dev deploy!
-- job: dev
-  pool:
-    vmImage: 'vs2017-win2016'
-  dependsOn: 'buildandtest'
-  steps:
-  
-#  - task: DownloadBuildArtifacts@0
-#    inputs:
-#      buildType: 'specific'
-#      artifactName: 'drop'
-#      project: '6b82ca9d-276f-4bea-8d70-4e13b8194d1d'
-#      pipeline: '12'
-#      downloadType: 'specific'
-#      itemPattern: '**/*.zip'
-#      downloadPath: '$(System.DefaultWorkingDirectory)'
-
-  
-  - task: AzureRmWebAppDeployment@3
-    displayName: 'Deploy Azure App Service'
-    inputs:
-      azureSubscription: 'pip-js-mre - Azure'
-      WebAppName: 'dev-pip-js-mre'
-      Package: '$(System.DefaultWorkingDirectory)/**/*.zip'
-      GenerateWebConfig: true
-      WebConfigParameters: '-Handler iisnode -NodeStartFile server.js -appType node'
-      TakeAppOfflineFlag: true
-      UseWebDeploy: true
-      RenameFilesFlag: true
-
-#  - task: AzureRmWebAppDeployment@4
-#    displayName: 'Deploy to dev'
-#    inputs:
-#      ConnectionType: 'AzureRM'
-#      azureSubscription: 'pip-js-mre - Azure'
-#      appType: 'webApp'
-#      WebAppName: 'dev-pip-js-mre'
-#      packageForLinux: '$(System.ArtifactsDirectory)/**/*.zip'
-#      WebConfigParameters: '-Handler iisnode -NodeStartFile server.js -appType node'
-#      enableCustomDeployment: true
-#      DeploymentType: 'webDeploy'
-
-  # test something, like UI Tests or something
-
-
-  # if dev successfully completes start deployment to prod
-- job: prod
-  pool:
-    vmImage: 'vs2017-win2016'
-  dependsOn: dev
+      # the following will publish an artifact called drop 
+- stage: 'B'
+  dependsOn: 'A'
   condition: succeeded()
-  steps:
+  jobs:
+      # job dev deploy!
+    - job: dev
+      pool:
+        vmImage: 'vs2017-win2016'
+      #dependsOn: 'buildandtest'
+      steps:
+      
+    #  - task: DownloadBuildArtifacts@0
+    #    inputs:
+    #      buildType: 'specific'
+    #      artifactName: 'drop'
+    #      project: '6b82ca9d-276f-4bea-8d70-4e13b8194d1d'
+    #      pipeline: '12'
+    #      downloadType: 'specific'
+    #      itemPattern: '**/*.zip'
+    #      downloadPath: '$(System.DefaultWorkingDirectory)'
 
-  - task: DownloadBuildArtifacts@0
-    inputs:
-      buildType: 'specific'
-      artifactName: 'drop'
-      project: '6b82ca9d-276f-4bea-8d70-4e13b8194d1d'
-      pipeline: '12'
-      downloadType: 'specific'
-      itemPattern: '**/*.zip'
-      downloadPath: $(Build.ArtifactStagingDirectory)'
+      
+      - task: AzureRmWebAppDeployment@3
+        displayName: 'Deploy Azure App Service'
+        inputs:
+          azureSubscription: 'pip-js-mre - Azure'
+          WebAppName: 'dev-pip-js-mre'
+          Package: '$(System.DefaultWorkingDirectory)/**/*.zip'
+          GenerateWebConfig: true
+          WebConfigParameters: '-Handler iisnode -NodeStartFile server.js -appType node'
+          TakeAppOfflineFlag: true
+          UseWebDeploy: true
+          RenameFilesFlag: true
 
-  # step to download the artifacts from the previous job
-  - task: AzureRmWebAppDeployment@4
-    displayName: 'Deploy to production'
-    inputs:
-      ConnectionType: 'AzureRM'
-      azureSubscription: 'pip-js-mre - Azure'
-      appType: 'webApp'
-      WebAppName: 'pip-js-mre'
-      packageForLinux: '$(Build.ArtifactStagingDirectory))/**/*.zip'
-      WebConfigParameters: '-Handler iisnode -NodeStartFile server.js -appType node'
-      enableCustomDeployment: true
-      DeploymentType: 'webDeploy'
+    #  - task: AzureRmWebAppDeployment@4
+    #    displayName: 'Deploy to dev'
+    #    inputs:
+    #      ConnectionType: 'AzureRM'
+    #      azureSubscription: 'pip-js-mre - Azure'
+    #      appType: 'webApp'
+    #      WebAppName: 'dev-pip-js-mre'
+    #      packageForLinux: '$(System.ArtifactsDirectory)/**/*.zip'
+    #      WebConfigParameters: '-Handler iisnode -NodeStartFile server.js -appType node'
+    #      enableCustomDeployment: true
+    #      DeploymentType: 'webDeploy'
+
+      # test something, like UI Tests or something
+
+- stage: 'C'
+  dependsOn: 'B'
+  jobs:
+      # if dev successfully completes start deployment to prod
+    - job: prod
+      pool:
+        vmImage: 'vs2017-win2016'
+      #dependsOn: dev
+      #condition: succeeded()
+      steps:
+
+      - task: DownloadBuildArtifacts@0
+        inputs:
+          buildType: 'specific'
+          artifactName: 'drop'
+          project: '6b82ca9d-276f-4bea-8d70-4e13b8194d1d'
+          pipeline: '12'
+          downloadType: 'specific'
+          itemPattern: '**/*.zip'
+          downloadPath: $(Build.ArtifactStagingDirectory)'
+
+      # step to download the artifacts from the previous job
+      - task: AzureRmWebAppDeployment@4
+        displayName: 'Deploy to production'
+        inputs:
+          ConnectionType: 'AzureRM'
+          azureSubscription: 'pip-js-mre - Azure'
+          appType: 'webApp'
+          WebAppName: 'pip-js-mre'
+          packageForLinux: '$(Build.ArtifactStagingDirectory))/**/*.zip'
+          WebConfigParameters: '-Handler iisnode -NodeStartFile server.js -appType node'
+          enableCustomDeployment: true
+          DeploymentType: 'webDeploy'
