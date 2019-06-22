@@ -1,3 +1,69 @@
+jobs:
+
+- job: buildandtest
+  pool:
+    vmImage: 'ubuntu-16.04'
+  steps:
+- task: NodeTool@0 
+  inputs:
+    versionSpec: '8.x'
+
+- task: Npm@1
+  inputs:
+    command: 'install'
+- task: Npm@1
+  inputs:
+    command: 'custom'
+    customCommand: 'test'
+
+- task: PublishTestResults@2
+  condition: succeededOrFailed()
+  inputs:
+    testRunner: JUnit
+    testResultsFiles: '**/TEST-RESULTS.xml'
+
+- task: PublishCodeCoverageResults@1
+  inputs: 
+    codeCoverageTool: Cobertura
+    summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/*coverage.xml'
+    reportDirectory: '$(System.DefaultWorkingDirectory)/**/coverage'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(System.DefaultWorkingDirectory)'
+
+- task: ArchiveFiles@2
+  inputs:
+    rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
+    includeRootFolder: false
+
+  # the following will publish an artifact called drop
+
+- task: AzureRmWebAppDeployment@3
+  inputs:
+    azureSubscription: '<Test stage Azure service connection>'
+    WebAppName: '<name of test stage web app>'
+
+  # test something, like UI Tests or something
+
+- job: prod
+  pool:
+    vmImage: 'ubuntu-16.04'
+  dependsOn: buildandtest
+  condition: succeeded()
+  steps:
+
+  # step to download the artifacts from the previous job
+  - task: DownloadBuildArtifacts@0
+    inputs:
+      artifactName: drop
+
+  - task: AzureRmWebAppDeployment@3
+    inputs:
+      azureSubscription: '<Prod stage Azure service connection>'
+      WebAppName: '<name of prod stage web app>'
+
+
 # Build NodeJS Express app using Azure Pipelines
 # https://docs.microsoft.com/azure/devops/pipelines/languages/javascript?view=vsts
 pool:
