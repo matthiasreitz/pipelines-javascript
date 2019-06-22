@@ -29,14 +29,14 @@ jobs:
       summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/*coverage.xml'
       reportDirectory: '$(System.DefaultWorkingDirectory)/**/coverage'
 
-  - task: PublishBuildArtifacts@1
-    inputs:
-      PathtoPublish: '$(System.DefaultWorkingDirectory)'
-
   - task: ArchiveFiles@2
     inputs:
       rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
       includeRootFolder: false
+
+  - task: PublishBuildArtifacts@1
+    inputs:
+      PathtoPublish: '$(System.DefaultWorkingDirectory)'
 
   # the following will publish an artifact called drop
 
