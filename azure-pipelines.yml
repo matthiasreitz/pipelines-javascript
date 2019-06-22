@@ -41,8 +41,12 @@ jobs:
   # the following will publish an artifact called drop 
 
   # job dev deploy!
+- job: dev
+  pool:
+    vmImage: 'vs2017-win2016'
+    steps:
   
-  - task: AzureRmWebAppDeployment@4
+    - task: AzureRmWebAppDeployment@4
     displayName: 'Deploy to dev'
     inputs:
       ConnectionType: 'AzureRM'
@@ -71,7 +75,6 @@ jobs:
       artifactName: 'drop'
       project: '6b82ca9d-276f-4bea-8d70-4e13b8194d1d'
       pipeline: '12'
-      buildVersionToDownload: 'latest'
       downloadType: 'specific'
       itemPattern: '**/*.zip'
       downloadPath: '$(System.ArtifactsDirectory)'
