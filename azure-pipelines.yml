@@ -1,7 +1,7 @@
 stages:
-- stage: A
+- stage: 'buildAndTest'
   jobs:
-    - job: buildandtest
+    - job: buildAndTest
       pool:
         vmImage: 'vs2017-win2016'
       steps:
@@ -43,10 +43,8 @@ stages:
           ArtifactName: 'drop'
           publishLocation: 'Container'
           
-
-      # the following will publish an artifact called drop 
-- stage: 'B'
-  dependsOn: 'A'
+- stage: 'TestOnDev'
+  dependsOn: 'buildAndTest'
   condition: succeeded()
   jobs:
       # job dev deploy!
@@ -75,50 +73,32 @@ stages:
           UseWebDeploy: true
           RenameFilesFlag: true
 
-    #  - task: AzureRmWebAppDeployment@4
-    #    displayName: 'Deploy to dev'
-    #    inputs:
-    #      ConnectionType: 'AzureRM'
-    #      azureSubscription: 'pip-js-mre - Azure'
-    #      appType: 'webApp'
-    #      WebAppName: 'dev-pip-js-mre'
-    #      packageForLinux: '$(System.ArtifactsDirectory)/**/*.zip'
-    #      WebConfigParameters: '-Handler iisnode -NodeStartFile server.js -appType node'
-    #      enableCustomDeployment: true
-    #      DeploymentType: 'webDeploy'
+      # run acceptance tests
 
-      # test something, like UI Tests or something
-
-- stage: 'C'
-  dependsOn: 'B'
+- stage: 'DeployToProduction'
+  dependsOn: 'TestOnDev'
+  condition: 'succeeded()'
   jobs:
       # if dev successfully completes start deployment to prod
-    - job: prod
+    - job: production
       pool:
         vmImage: 'vs2017-win2016'
-      #dependsOn: dev
-      #condition: succeeded()
       steps:
-
       - task: DownloadBuildArtifacts@0
         inputs:
-          buildType: 'specific'
+          buildType: 'current'
+          downloadType: 'single'
           artifactName: 'drop'
-          project: '6b82ca9d-276f-4bea-8d70-4e13b8194d1d'
-          pipeline: '12'
-          downloadType: 'specific'
-          itemPattern: '**/*.zip'
-          downloadPath: $(Build.ArtifactStagingDirectory)'
-
-      # step to download the artifacts from the previous job
-      - task: AzureRmWebAppDeployment@4
-        displayName: 'Deploy to production'
+          downloadPath: '$(System.ArtifactsDirectory)'
+      
+      - task: AzureRmWebAppDeployment@3
+        displayName: 'Deploy Azure App Service'
         inputs:
-          ConnectionType: 'AzureRM'
           azureSubscription: 'pip-js-mre - Azure'
-          appType: 'webApp'
           WebAppName: 'pip-js-mre'
-          packageForLinux: '$(Build.ArtifactStagingDirectory))/**/*.zip'
+          Package: '$(System.ArtifactsDirectory)/drop/*.zip'
+          GenerateWebConfig: true
           WebConfigParameters: '-Handler iisnode -NodeStartFile server.js -appType node'
-          enableCustomDeployment: true
-          DeploymentType: 'webDeploy'
+          TakeAppOfflineFlag: true
+          UseWebDeploy: true
+          RenameFilesFlag: true
