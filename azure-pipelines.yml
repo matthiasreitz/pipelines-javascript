@@ -55,7 +55,7 @@ jobs:
       pipeline: '12'
       downloadType: 'specific'
       itemPattern: '**/*.zip'
-      downloadPath: '$(System.ArtifactsDirectory)'
+      downloadPath: '$(Build.ArtifactStagingDirectory)'
 
   - task: AzureRmWebAppDeployment@4
     displayName: 'Deploy to dev'
@@ -88,7 +88,7 @@ jobs:
       pipeline: '12'
       downloadType: 'specific'
       itemPattern: '**/*.zip'
-      downloadPath: '$(System.ArtifactsDirectory)'
+      downloadPath: $(Build.ArtifactStagingDirectory)'
 
   # step to download the artifacts from the previous job
   - task: AzureRmWebAppDeployment@4
@@ -98,7 +98,7 @@ jobs:
       azureSubscription: 'pip-js-mre - Azure'
       appType: 'webApp'
       WebAppName: 'pip-js-mre'
-      packageForLinux: '$(System.ArtifactsDirectory)/**/*.zip'
+      packageForLinux: '$(Build.ArtifactStagingDirectory))/**/*.zip'
       WebConfigParameters: '-Handler iisnode -NodeStartFile server.js -appType node'
       enableCustomDeployment: true
       DeploymentType: 'webDeploy'
