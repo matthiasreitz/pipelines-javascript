@@ -71,7 +71,7 @@ stages:
         inputs:
           azureSubscription: 'pip-js-mre - Azure'
           WebAppName: 'dev-pip-js-mre'
-          Package: '$(System.DefaultWorkingDirectory)\**\*.zip'
+          Package: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
           GenerateWebConfig: true
           WebConfigParameters: '-Handler iisnode -NodeStartFile server.js -appType node'
           TakeAppOfflineFlag: true
