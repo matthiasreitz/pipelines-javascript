@@ -55,19 +55,32 @@ jobs:
       pipeline: '12'
       downloadType: 'specific'
       itemPattern: '**/*.zip'
-      downloadPath: '$(Build.ArtifactStagingDirectory)'
+      downloadPath: '$(System.DefaultWorkingDirectory)'
 
-  - task: AzureRmWebAppDeployment@4
-    displayName: 'Deploy to dev'
+  
+  - task: AzureRmWebAppDeployment@3
+    displayName: 'Deploy Azure App Service'
     inputs:
-      ConnectionType: 'AzureRM'
       azureSubscription: 'pip-js-mre - Azure'
-      appType: 'webApp'
       WebAppName: 'dev-pip-js-mre'
-      packageForLinux: '$(System.ArtifactsDirectory)/**/*.zip'
+      Package: '$(System.DefaultWorkingDirectory)/**/*.zip'
+      GenerateWebConfig: true
       WebConfigParameters: '-Handler iisnode -NodeStartFile server.js -appType node'
-      enableCustomDeployment: true
-      DeploymentType: 'webDeploy'
+      TakeAppOfflineFlag: true
+      UseWebDeploy: true
+      RenameFilesFlag: true
+
+#  - task: AzureRmWebAppDeployment@4
+#    displayName: 'Deploy to dev'
+#    inputs:
+#      ConnectionType: 'AzureRM'
+#      azureSubscription: 'pip-js-mre - Azure'
+#      appType: 'webApp'
+#      WebAppName: 'dev-pip-js-mre'
+#      packageForLinux: '$(System.ArtifactsDirectory)/**/*.zip'
+#      WebConfigParameters: '-Handler iisnode -NodeStartFile server.js -appType node'
+#      enableCustomDeployment: true
+#      DeploymentType: 'webDeploy'
 
   # test something, like UI Tests or something
 
