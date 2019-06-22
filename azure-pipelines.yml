@@ -39,8 +39,9 @@ stages:
           
       - task: PublishBuildArtifacts@1
         inputs:
-          PathtoPublish: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)'
           ArtifactName: 'drop'
+          publishLocation: 'Container'
           
 
       # the following will publish an artifact called drop 
@@ -55,23 +56,19 @@ stages:
       #dependsOn: 'buildandtest'
       steps:
       
-    #  - task: DownloadBuildArtifacts@0
-    #    inputs:
-    #      buildType: 'specific'
-    #      artifactName: 'drop'
-    #      project: '6b82ca9d-276f-4bea-8d70-4e13b8194d1d'
-    #      pipeline: '12'
-    #      downloadType: 'specific'
-    #      itemPattern: '**/*.zip'
-    #      downloadPath: '$(System.DefaultWorkingDirectory)'
-
+      - task: DownloadBuildArtifacts@0
+        inputs:
+          buildType: 'current'
+          downloadType: 'single'
+          artifactName: 'drop'
+          downloadPath: '$(System.ArtifactsDirectory)'
       
       - task: AzureRmWebAppDeployment@3
         displayName: 'Deploy Azure App Service'
         inputs:
           azureSubscription: 'pip-js-mre - Azure'
           WebAppName: 'dev-pip-js-mre'
-          Package: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+          Package: '$(System.ArtifactsDirectory)/drop/*.zip'
           GenerateWebConfig: true
           WebConfigParameters: '-Handler iisnode -NodeStartFile server.js -appType node'
           TakeAppOfflineFlag: true
