@@ -37,6 +37,7 @@ jobs:
   - task: PublishBuildArtifacts@1
 
   # the following will publish an artifact called drop
+  - task: DownloadBuildArtifacts@0
 
   - task: AzureRmWebAppDeployment@3
     displayName: 'Deploy Azure App Service'
