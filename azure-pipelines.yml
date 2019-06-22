@@ -4,45 +4,53 @@ jobs:
   pool:
     vmImage: 'ubuntu-16.04'
   steps:
-- task: NodeTool@0 
-  inputs:
-    versionSpec: '8.x'
+  - task: NodeTool@0 
+    inputs:
+      versionSpec: '8.x'
 
-- task: Npm@1
-  inputs:
-    command: 'install'
-- task: Npm@1
-  inputs:
-    command: 'custom'
-    customCommand: 'test'
+  - task: Npm@1
+    inputs:
+      command: 'install'
 
-- task: PublishTestResults@2
-  condition: succeededOrFailed()
-  inputs:
-    testRunner: JUnit
-    testResultsFiles: '**/TEST-RESULTS.xml'
+  - task: Npm@1
+    inputs:
+      command: 'custom'
+      customCommand: 'test'
 
-- task: PublishCodeCoverageResults@1
-  inputs: 
-    codeCoverageTool: Cobertura
-    summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/*coverage.xml'
-    reportDirectory: '$(System.DefaultWorkingDirectory)/**/coverage'
+  - task: PublishTestResults@2
+    condition: succeededOrFailed()
+    inputs:
+      testRunner: JUnit
+      testResultsFiles: '**/TEST-RESULTS.xml'
 
-- task: PublishBuildArtifacts@1
-  inputs:
-    PathtoPublish: '$(System.DefaultWorkingDirectory)'
+  - task: PublishCodeCoverageResults@1
+    inputs: 
+      codeCoverageTool: Cobertura
+      summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/*coverage.xml'
+      reportDirectory: '$(System.DefaultWorkingDirectory)/**/coverage'
 
-- task: ArchiveFiles@2
-  inputs:
-    rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
-    includeRootFolder: false
+  - task: PublishBuildArtifacts@1
+    inputs:
+      PathtoPublish: '$(System.DefaultWorkingDirectory)'
+
+  - task: ArchiveFiles@2
+    inputs:
+      rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
+      includeRootFolder: false
 
   # the following will publish an artifact called drop
 
-- task: AzureRmWebAppDeployment@3
-  inputs:
-    azureSubscription: '<Test stage Azure service connection>'
-    WebAppName: '<name of test stage web app>'
+  - task: AzureRmWebAppDeployment@3
+    displayName: 'Deploy Azure App Service'
+    inputs:
+      azureSubscription: 'pip-js-mre - Azure'
+      WebAppName: 'dev-pip-js-mre'
+      Package: '$(System.DefaultWorkingDirectory)\**\*.zip'
+      GenerateWebConfig: true
+      WebConfigParameters: '-Handler iisnode -NodeStartFile server.js -appType node'
+      TakeAppOfflineFlag: true
+      UseWebDeploy: true
+      RenameFilesFlag: true
 
   # test something, like UI Tests or something
 
@@ -60,46 +68,11 @@ jobs:
 
   - task: AzureRmWebAppDeployment@3
     inputs:
-      azureSubscription: '<Prod stage Azure service connection>'
-      WebAppName: '<name of prod stage web app>'
-
-
-# Build NodeJS Express app using Azure Pipelines
-# https://docs.microsoft.com/azure/devops/pipelines/languages/javascript?view=vsts
-pool:
-  vmImage: 'Ubuntu 16.04'
-  
-steps:
-- task: NodeTool@0
-  inputs:
-    versionSpec: '8.x'
-  
-- task: Npm@1
-  displayName: 'npm install'
-  inputs:
-    command: install
-
-- task: Npm@1
-  displayName: 'npm test'
-  inputs:
-    command: custom
-    customCommand: 'test'
-
-- task: PublishTestResults@2
-  inputs:
-    testResultsFiles: '**/TEST-RESULTS.xml'
-    testRunTitle: 'Test results for JavaScript'
-  condition: succeededOrFailed()
-
-- task: PublishCodeCoverageResults@1
-  inputs: 
-    codeCoverageTool: Cobertura
-    summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/*coverage.xml'
-    reportDirectory: '$(System.DefaultWorkingDirectory)/**/coverage'
-    
-- task: ArchiveFiles@2
-  inputs:
-    rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
-    includeRootFolder: false
-
-- task: PublishBuildArtifacts@1
+      azureSubscription: 'pip-js-mre - Azure'
+      WebAppName: 'pip-js-mre'
+      Package: '$(System.DefaultWorkingDirectory)\**\*.zip'
+      GenerateWebConfig: true
+      WebConfigParameters: '-Handler iisnode -NodeStartFile server.js -appType node'
+      TakeAppOfflineFlag: true
+      UseWebDeploy: true
+      RenameFilesFlag: true
