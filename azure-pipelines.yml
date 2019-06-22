@@ -63,7 +63,7 @@ jobs:
       appType: 'webApp'
       WebAppName: 'dev-pip-js-mre'
       packageForLinux: '$(System.ArtifactsDirectory)/**/*.zip'
-      WebConfigParameters: '''-Handler iisnode -NodeStartFile server.js -appType node'''
+      WebConfigParameters: '-Handler iisnode -NodeStartFile server.js -appType node'
       enableCustomDeployment: true
       DeploymentType: 'webDeploy'
 
