@@ -33,7 +33,7 @@ jobs:
     inputs:
       rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
       archiveType: 'zip'
-      archiveFile: '$(Build.ArtifactStagingDirectory)/drop/$(Build.BuildId).zip'
+      archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
       includeRootFolder: false
       
 
