@@ -45,19 +45,19 @@ jobs:
 - job: dev
   pool:
     vmImage: 'vs2017-win2016'
-    steps:
+  steps:
   
-    - task: DownloadBuildArtifacts@0
-      inputs:
-        buildType: 'specific'
-        artifactName: 'drop'
-        project: '6b82ca9d-276f-4bea-8d70-4e13b8194d1d'
-        pipeline: '12'
-        downloadType: 'specific'
-        itemPattern: '**/*.zip'
-        downloadPath: '$(System.ArtifactsDirectory)'
+  - task: DownloadBuildArtifacts@0
+    inputs:
+      buildType: 'specific'
+      artifactName: 'drop'
+      project: '6b82ca9d-276f-4bea-8d70-4e13b8194d1d'
+      pipeline: '12'
+      downloadType: 'specific'
+      itemPattern: '**/*.zip'
+      downloadPath: '$(System.ArtifactsDirectory)'
 
-    - task: AzureRmWebAppDeployment@4
+  - task: AzureRmWebAppDeployment@4
     displayName: 'Deploy to dev'
     inputs:
       ConnectionType: 'AzureRM'
