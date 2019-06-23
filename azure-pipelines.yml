@@ -64,7 +64,7 @@ stages:
       - task: AzureRmWebAppDeployment@3
         displayName: 'Deploy Azure App Service'
         inputs:
-          azureSubscription: 'Free Trial'
+          azureSubscription: 'Free Trial(f2adc83a-357a-4bca-97c8-5968bf916e5d)'
           WebAppName: 'devCICDonAzure'
           Package: '$(System.ArtifactsDirectory)/drop/*.zip'
           GenerateWebConfig: true
@@ -94,7 +94,7 @@ stages:
       - task: AzureRmWebAppDeployment@3
         displayName: 'Deploy Azure App Service'
         inputs:
-          azureSubscription: 'Free Trial'
+          azureSubscription: 'Free Trial(f2adc83a-357a-4bca-97c8-5968bf916e5d)'
           WebAppName: 'CICDonAzure'
           Package: '$(System.ArtifactsDirectory)/drop/*.zip'
           GenerateWebConfig: true
