@@ -64,8 +64,8 @@ stages:
       - task: AzureRmWebAppDeployment@3
         displayName: 'Deploy Azure App Service'
         inputs:
-          azureSubscription: 'pip-js-mre - Azure'
-          WebAppName: 'dev-pip-js-mre'
+          azureSubscription: 'f2adc83a-357a-4bca-97c8-5968bf916e5d'
+          WebAppName: 'devCICDonAzure'
           Package: '$(System.ArtifactsDirectory)/drop/*.zip'
           GenerateWebConfig: true
           WebConfigParameters: '-Handler iisnode -NodeStartFile server.js -appType node'
@@ -94,8 +94,8 @@ stages:
       - task: AzureRmWebAppDeployment@3
         displayName: 'Deploy Azure App Service'
         inputs:
-          azureSubscription: 'pip-js-mre - Azure'
-          WebAppName: 'pip-js-mre'
+          azureSubscription: 'f2adc83a-357a-4bca-97c8-5968bf916e5d'
+          WebAppName: 'CICDonAzure'
           Package: '$(System.ArtifactsDirectory)/drop/*.zip'
           GenerateWebConfig: true
           WebConfigParameters: '-Handler iisnode -NodeStartFile server.js -appType node'
