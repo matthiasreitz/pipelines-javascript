@@ -19,10 +19,6 @@ stages:
           command: 'custom'
           customCommand: 'test'
 
-
-
-
-
       - task: PublishTestResults@2
         condition: succeededOrFailed()
         inputs:
@@ -75,6 +71,7 @@ stages:
         inputs:
           testSelector: 'testAssemblies'
           testAssemblyVer2: '**\*Test*.dll
+            **\bin\debug\*test*.dll
             !**\*TestAdapter.dll
             !**\obj\**'
           searchFolder: '$(System.ArtifactsDirectory)'
