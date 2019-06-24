@@ -10,16 +10,21 @@ stages:
         inputs:
           packageFeedSelector: 'nugetOrg'
           versionSelector: 'latestStable'
+
       - task: VSTest@2
         inputs:
           testSelector: 'testAssemblies'
           testAssemblyVer2: '**\*Test*.dll
             !**\*TestAdapter.dll
             !**\obj\**'
-          searchFolder: '$(DefaultWorkingDirectory)'
+          searchFolder: '$(System.DefaultWorkingDirectory)'
           uiTests: true
           vsTestVersion: 'toolsInstaller'
           testRunTitle: 'UITests'
+
+
+
+
 
           
       - task: NodeTool@0 
