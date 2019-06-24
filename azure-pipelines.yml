@@ -18,6 +18,23 @@ stages:
           command: 'custom'
           customCommand: 'test'
 
+      - task: VisualStudioTestPlatformInstaller@1
+        inputs:
+          packageFeedSelector: 'nugetOrg'
+          versionSelector: 'latestStable'
+      - task: VSTest@2
+        inputs:
+          testSelector: 'testAssemblies'
+          testAssemblyVer2: '**\*test*.dll
+            !**\*TestAdapter.dll
+            !**\obj\**'
+          searchFolder: '$(System.DefaultWorkingDirectory)'
+          uiTests: true
+          vsTestVersion: 'toolsInstaller'
+          testRunTitle: 'UITests'
+
+
+
       - task: PublishTestResults@2
         condition: succeededOrFailed()
         inputs:
@@ -73,8 +90,8 @@ stages:
           UseWebDeploy: true
           RenameFilesFlag: true
 
-      # run acceptance tests
 
+          
 - stage: 'DeployToProduction'
   dependsOn: 'TestOnDev'
   condition: 'succeeded()'
