@@ -18,6 +18,20 @@ stages:
           command: 'custom'
           customCommand: 'test'
 
+      # run acceptance tests
+      - task: VSTest@2
+        inputs:
+          testSelector: 'testAssemblies'
+          testAssemblyVer2: '**\*Test*.dll
+            !**\*TestAdapter.dll
+            !**\obj\**'
+          searchFolder: '$(System.DefaultWorkingDirectory)'
+          uiTests: true
+          vsTestVersion: '15.0'
+          testRunTitle: 'UITests'
+
+
+
       - task: PublishTestResults@2
         condition: succeededOrFailed()
         inputs:
@@ -73,17 +87,7 @@ stages:
           UseWebDeploy: true
           RenameFilesFlag: true
 
-      # run acceptance tests
-      - task: VSTest@2
-        inputs:
-          testSelector: 'testAssemblies'
-          testAssemblyVer2: '**\*Test*.dll
-            !**\*TestAdapter.dll
-            !**\obj\**'
-          searchFolder: '$(System.DefaultWorkingDirectory)'
-          uiTests: true
-          vsTestVersion: '15.0'
-          testRunTitle: 'UITests'
+
           
 - stage: 'DeployToProduction'
   dependsOn: 'TestOnDev'
