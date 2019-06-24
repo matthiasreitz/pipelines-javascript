@@ -1,5 +1,5 @@
 stages:
-- stage: 'buildAndTest'
+- stage: 'commit'
   jobs:
     - job: buildAndTest
       pool:
@@ -49,8 +49,8 @@ stages:
           ArtifactName: 'drop'
           publishLocation: 'Container'
           
-- stage: 'TestOnDev'
-  dependsOn: 'buildAndTest'
+- stage: 'acceptance'
+  dependsOn: 'commit'
   condition: succeeded()
   jobs:
       # job dev deploy!
@@ -85,7 +85,7 @@ stages:
             **\bin\debug\*test*.dll
             !**\*TestAdapter.dll
             !**\obj\**'
-          searchFolder: '$(System.ArtifactsDirectory)'
+          searchFolder: '$(System.DefaultWorkingDirectory)/$(Build.BuildId))'
           uiTests: true
           vsTestVersion: 'toolsInstaller'
           testRunTitle: 'UITests'
@@ -104,8 +104,8 @@ stages:
 
 
           
-- stage: 'DeployToProduction'
-  dependsOn: 'TestOnDev'
+- stage: 'final'
+  dependsOn: 'acceptance'
   condition: 'succeeded()'
   jobs:
       # if dev successfully completes start deployment to prod
