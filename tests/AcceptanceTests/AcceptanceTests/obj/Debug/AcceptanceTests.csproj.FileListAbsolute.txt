@@ -18,3 +18,4 @@ D:\BachelorProjekt\pipelines-javascript\tests\AcceptanceTests\AcceptanceTests\bi
 D:\BachelorProjekt\pipelines-javascript\tests\AcceptanceTests\AcceptanceTests\obj\Debug\AcceptanceTests.csproj.CopyComplete
 D:\BachelorProjekt\pipelines-javascript\tests\AcceptanceTests\AcceptanceTests\obj\Debug\AcceptanceTests.dll
 D:\BachelorProjekt\pipelines-javascript\tests\AcceptanceTests\AcceptanceTests\obj\Debug\AcceptanceTests.pdb
+D:\BachelorProjekt\pipelines-javascript\tests\AcceptanceTests\AcceptanceTests\bin\Debug\Microsoft.VisualStudio.CodeCoverage.Shim.dll
