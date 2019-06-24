@@ -6,27 +6,6 @@ stages:
         vmImage: 'vs2017-win2016'
       steps:
 
-      - task: VisualStudioTestPlatformInstaller@1
-        inputs:
-          packageFeedSelector: 'nugetOrg'
-          versionSelector: 'latestStable'
-
-      - task: VSTest@2
-        inputs:
-          testSelector: 'testAssemblies'
-          testAssemblyVer2: '**\*Test*.dll
-            !**\*TestAdapter.dll
-            !**\obj\**'
-          searchFolder: '$(System.DefaultWorkingDirectory)'
-          uiTests: true
-          vsTestVersion: 'toolsInstaller'
-          testRunTitle: 'UITests'
-
-
-
-
-
-          
       - task: NodeTool@0 
         inputs:
           versionSpec: '8.x'
@@ -86,6 +65,17 @@ stages:
           downloadType: 'single'
           artifactName: 'drop'
           downloadPath: '$(System.ArtifactsDirectory)'
+
+      - task: VSTest@2
+        inputs:
+          testSelector: 'testAssemblies'
+          testAssemblyVer2: '**\*Test*.dll
+            !**\*TestAdapter.dll
+            !**\obj\**'
+          searchFolder: '$(System.DefaultWorkingDirectory)'
+          uiTests: true
+          vsTestVersion: 'toolsInstaller'
+          testRunTitle: 'UITests'
       
       - task: AzureRmWebAppDeployment@3
         displayName: 'Deploy Azure App Service'
