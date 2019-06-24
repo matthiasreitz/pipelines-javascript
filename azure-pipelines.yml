@@ -77,12 +77,16 @@ stages:
         inputs:
           packageFeedSelector: 'nugetOrg'
           versionSelector: 'latestStable'
+      
+      - task: DotNetCoreCLI@2
+        displayName: 'dotnet build'
+        inputs:
+          projects: '**/*.csproj'
 
-#      - task: DotNetCoreCLI@2
-#        inputs:
-#          command: 'test'
-#          projects: '$(System.DefaultWorkingDirectory)/$(Build.BuildId)/tests/AcceptanceTests/AcceptanceTests/bin/Debug/AcceptanceTests.dll'
-
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'test'
+          projects: '**/*Tests/*.csproj'
 
       - task: VSTest@2
         inputs:
