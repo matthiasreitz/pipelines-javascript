@@ -85,7 +85,7 @@ stages:
             **\bin\debug\*test*.dll
             !**\*TestAdapter.dll
             !**\obj\**'
-          searchFolder: '$(System.DefaultWorkingDirectory)/$(Build.BuildId))'
+          searchFolder: '$(System.DefaultWorkingDirectory)/$(Build.BuildId)'
           uiTests: true
           vsTestVersion: 'toolsInstaller'
           testRunTitle: 'UITests'
