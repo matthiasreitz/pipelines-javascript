@@ -70,8 +70,8 @@ stages:
       - task: ExtractFiles@1
         inputs:
           archiveFilePatterns: '$(System.ArtifactsDirectory)/**/*.zip'
-          destinationFolder: '$(System.DefaultWorkingDirectory)'
-          cleanDestinationFolder: true
+          destinationFolder: '$(System.DefaultWorkingDirectory)/$(Build.BuildId)'
+          cleanDestinationFolder: false
 
       - task: VisualStudioTestPlatformInstaller@1
         inputs:
