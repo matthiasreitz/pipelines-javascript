@@ -25,6 +25,7 @@ namespace UITests
 
             try
             {
+                System.Threading.Thread.Sleep(5000);
                 Assert.AreEqual(anzeigeText.Text, "Azure Pipelines");
             }
             finally
