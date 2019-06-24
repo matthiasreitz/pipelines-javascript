@@ -16,7 +16,7 @@ stages:
           testAssemblyVer2: '**\*Test*.dll
             !**\*TestAdapter.dll
             !**\obj\**'
-          searchFolder: '$(System.DefaultWorkingDirectory)'
+          searchFolder: '$(System.DefaultWorkingDirectory)/tests/AcceptanceTests'
           uiTests: true
           vsTestVersion: 'toolsInstaller'
           testRunTitle: 'UITests'
