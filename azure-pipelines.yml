@@ -82,6 +82,7 @@ stages:
         inputs:
           testSelector: 'testAssemblies'
           testAssemblyVer2: '**\*Test*.dll
+            **\*AcceptanceTest*.dll
             **\bin\debug\*test*.dll
             !**\*TestAdapter.dll
             !**\obj\**'
