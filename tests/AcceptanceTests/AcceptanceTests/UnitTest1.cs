@@ -9,16 +9,23 @@ namespace UITests
     [TestClass]
     public class UITest
     {
+        public IWebDriver driver;
+        public WebDriverWait wait;
+
         public UITest()
         {
+        }
+
+        [TestInitialize]
+        public void Init()
+        {
+            driver = new ChromeDriver();
+            wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
         }
 
         [TestMethod]
         public void TestMethod1()
         {
-            IWebDriver driver = new ChromeDriver();
-            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-
             driver.Navigate().GoToUrl("https://devcicdonazure.azurewebsites.net/");
 
             IWebElement anzeigeText = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(By.XPath("/html/body")));
@@ -32,6 +39,11 @@ namespace UITests
             {
                 driver.Quit();
             }
+        }
+        [TestCleanup]
+        public void TearDown()
+        {
+            driver.Quit();
         }
     }
 }
