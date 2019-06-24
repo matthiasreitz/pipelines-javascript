@@ -71,7 +71,7 @@ stages:
         inputs:
           archiveFilePatterns: '$(System.ArtifactsDirectory)/**/*.zip'
           destinationFolder: '$(System.DefaultWorkingDirectory)'
-          cleanDestinationFolder: false
+          cleanDestinationFolder: true
 
       - task: VisualStudioTestPlatformInstaller@1
         inputs:
