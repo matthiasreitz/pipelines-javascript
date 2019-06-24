@@ -69,7 +69,7 @@ stages:
 
       - task: ExtractFiles@1
         inputs:
-          archiveFilePatterns: '*.zip'
+          archiveFilePatterns: '$(System.ArtifactsDirectory)/**/*.zip'
           destinationFolder: '$(System.DefaultWorkingDirectory)'
           cleanDestinationFolder: false
 
