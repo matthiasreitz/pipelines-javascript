@@ -18,16 +18,19 @@ stages:
           command: 'custom'
           customCommand: 'test'
 
-      # run acceptance tests
+      - task: VisualStudioTestPlatformInstaller@1
+        inputs:
+          packageFeedSelector: 'nugetOrg'
+          versionSelector: 'latestStable'
       - task: VSTest@2
         inputs:
           testSelector: 'testAssemblies'
-          testAssemblyVer2: '**\*Test*.dll
+          testAssemblyVer2: '**\*test*.dll
             !**\*TestAdapter.dll
             !**\obj\**'
           searchFolder: '$(System.DefaultWorkingDirectory)'
           uiTests: true
-          vsTestVersion: '15.0'
+          vsTestVersion: 'toolsInstaller'
           testRunTitle: 'UITests'
 
 
