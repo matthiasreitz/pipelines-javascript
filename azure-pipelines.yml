@@ -5,6 +5,23 @@ stages:
       pool:
         vmImage: 'vs2017-win2016'
       steps:
+
+      - task: VisualStudioTestPlatformInstaller@1
+        inputs:
+          packageFeedSelector: 'nugetOrg'
+          versionSelector: 'latestStable'
+      - task: VSTest@2
+        inputs:
+          testSelector: 'testAssemblies'
+          testAssemblyVer2: '**\*Test*.dll
+            !**\*TestAdapter.dll
+            !**\obj\**'
+          searchFolder: '$(System.DefaultWorkingDirectory)'
+          uiTests: true
+          vsTestVersion: 'toolsInstaller'
+          testRunTitle: 'UITests'
+
+          
       - task: NodeTool@0 
         inputs:
           versionSpec: '8.x'
@@ -18,20 +35,7 @@ stages:
           command: 'custom'
           customCommand: 'test'
 
-      - task: VisualStudioTestPlatformInstaller@1
-        inputs:
-          packageFeedSelector: 'nugetOrg'
-          versionSelector: 'latestStable'
-      - task: VSTest@2
-        inputs:
-          testSelector: 'testAssemblies'
-          testAssemblyVer2: '**\*test*.dll
-            !**\*TestAdapter.dll
-            !**\obj\**'
-          searchFolder: '$(System.DefaultWorkingDirectory)'
-          uiTests: true
-          vsTestVersion: 'toolsInstaller'
-          testRunTitle: 'UITests'
+
 
 
 
