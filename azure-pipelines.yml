@@ -78,14 +78,20 @@ stages:
           packageFeedSelector: 'nugetOrg'
           versionSelector: 'latestStable'
 
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'test'
+          projects: '$(System.DefaultWorkingDirectory)/$(Build.BuildId)/tests/AcceptanceTests/AcceptanceTests/bin/Debug/AcceptanceTests.dll'
+
+
       - task: VSTest@2
         inputs:
           testSelector: 'testAssemblies'
-          testAssemblyVer2: '**\*Test*.dll
-            **\*AcceptanceTest*.dll
-            **\bin\debug\*test*.dll
-            !**\*TestAdapter.dll
-            !**\obj\**'
+          testAssemblyVer2: '**/*Test*.dll
+            **/*AcceptanceTest*.dll
+            **/bin/debug/*test*.dll
+            !**/*TestAdapter.dll
+            !**/obj/**'
           searchFolder: '$(System.DefaultWorkingDirectory)'
           uiTests: true
           vsTestVersion: 'toolsInstaller'
