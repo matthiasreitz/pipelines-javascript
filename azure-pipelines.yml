@@ -1,32 +1,11 @@
 stages:
-- stage: 'buildAndTest'
+- stage: 'commit'
   jobs:
     - job: buildAndTest
       pool:
         vmImage: 'vs2017-win2016'
       steps:
 
-      - task: VisualStudioTestPlatformInstaller@1
-        inputs:
-          packageFeedSelector: 'nugetOrg'
-          versionSelector: 'latestStable'
-
-      - task: VSTest@2
-        inputs:
-          testSelector: 'testAssemblies'
-          testAssemblyVer2: '**\*Test*.dll
-            !**\*TestAdapter.dll
-            !**\obj\**'
-          searchFolder: '$(System.DefaultWorkingDirectory)'
-          uiTests: true
-          vsTestVersion: 'toolsInstaller'
-          testRunTitle: 'UITests'
-
-
-
-
-
-          
       - task: NodeTool@0 
         inputs:
           versionSpec: '8.x'
@@ -40,9 +19,10 @@ stages:
           command: 'custom'
           customCommand: 'test'
 
-
-
-
+      - task: Npm@1
+        inputs:
+          command: 'custom'
+          customCommand: 'build'
 
       - task: PublishTestResults@2
         condition: succeededOrFailed()
@@ -69,8 +49,8 @@ stages:
           ArtifactName: 'drop'
           publishLocation: 'Container'
           
-- stage: 'TestOnDev'
-  dependsOn: 'buildAndTest'
+- stage: 'acceptance'
+  dependsOn: 'commit'
   condition: succeeded()
   jobs:
       # job dev deploy!
@@ -86,6 +66,40 @@ stages:
           downloadType: 'single'
           artifactName: 'drop'
           downloadPath: '$(System.ArtifactsDirectory)'
+
+      - task: ExtractFiles@1
+        inputs:
+          archiveFilePatterns: '$(System.ArtifactsDirectory)/**/*.zip'
+          destinationFolder: '$(System.DefaultWorkingDirectory)/$(Build.BuildId)'
+          cleanDestinationFolder: false
+
+      - task: VisualStudioTestPlatformInstaller@1
+        inputs:
+          packageFeedSelector: 'nugetOrg'
+          versionSelector: 'latestStable'
+      
+      - task: DotNetCoreCLI@2
+        displayName: 'dotnet build'
+        inputs:
+          projects: '**/*.csproj'
+
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'test'
+          projects: '**/*Tests/*.csproj'
+
+      - task: VSTest@2
+        inputs:
+          testSelector: 'testAssemblies'
+          testAssemblyVer2: '**/*Test*.dll
+            **/*AcceptanceTest*.dll
+            **/bin/debug/*test*.dll
+            !**/*TestAdapter.dll
+            !**/obj/**'
+          searchFolder: '$(System.DefaultWorkingDirectory)'
+          uiTests: true
+          vsTestVersion: 'toolsInstaller'
+          testRunTitle: 'UITests'
       
       - task: AzureRmWebAppDeployment@3
         displayName: 'Deploy Azure App Service'
@@ -101,8 +115,8 @@ stages:
 
 
           
-- stage: 'DeployToProduction'
-  dependsOn: 'TestOnDev'
+- stage: 'final'
+  dependsOn: 'acceptance'
   condition: 'succeeded()'
   jobs:
       # if dev successfully completes start deployment to prod
