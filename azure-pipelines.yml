@@ -19,6 +19,11 @@ stages:
           command: 'custom'
           customCommand: 'test'
 
+      - task: Npm@1
+        inputs:
+          command: 'custom'
+          customCommand: 'build'
+
       - task: PublishTestResults@2
         condition: succeededOrFailed()
         inputs:
