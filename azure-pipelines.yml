@@ -6,60 +6,70 @@ stages:
         vmImage: 'vs2017-win2016'
       steps:
 
+# use specific node version
       - task: NodeTool@0 
         inputs:
           versionSpec: '8.x'
 
+# install required node packages
       - task: Npm@1
+        displayName: 'npm install'
         inputs:
           command: 'install'
 
+# run commit tests
       - task: Npm@1
+        displayName: 'npm test'
         inputs:
           command: 'custom'
           customCommand: 'test'
 
-      - task: Npm@1
-        inputs:
-          command: 'custom'
-          customCommand: 'build'
+# needed?
+#      - task: Npm@1
+#        inputs:
+#          command: 'custom'
+#          customCommand: 'build'
 
+# publish tests results to artifact repository
       - task: PublishTestResults@2
         condition: succeededOrFailed()
         inputs:
           testRunner: JUnit
           testResultsFiles: '**/TEST-RESULTS.xml'
 
+# publish code coverage results to artifact repository
       - task: PublishCodeCoverageResults@1
         inputs: 
           codeCoverageTool: Cobertura
           summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/*coverage.xml'
           reportDirectory: '$(System.DefaultWorkingDirectory)/**/coverage'
 
+# archive build artifacts to publish easily
       - task: ArchiveFiles@2
         inputs:
           rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
           archiveType: 'zip'
           archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
           includeRootFolder: false
-          
+
+# publish build artifacts to use in lates stages
       - task: PublishBuildArtifacts@1
         inputs:
           PathtoPublish: '$(Build.ArtifactStagingDirectory)'
           ArtifactName: 'drop'
           publishLocation: 'Container'
           
+# definition of acceptance stage
 - stage: 'acceptance'
   dependsOn: 'commit'
   condition: succeeded()
   jobs:
-      # job dev deploy!
     - job: dev
       pool:
         vmImage: 'vs2017-win2016'
-      #dependsOn: 'buildandtest'
       steps:
-      
+
+# download build artifacts to deploy them in dev environment
       - task: DownloadBuildArtifacts@0
         inputs:
           buildType: 'current'
@@ -67,42 +77,14 @@ stages:
           artifactName: 'drop'
           downloadPath: '$(System.ArtifactsDirectory)'
 
-      - task: ExtractFiles@1
-        inputs:
-          archiveFilePatterns: '$(System.ArtifactsDirectory)/**/*.zip'
-          destinationFolder: '$(System.DefaultWorkingDirectory)/$(Build.BuildId)'
-          cleanDestinationFolder: false
+#      - task: VisualStudioTestPlatformInstaller@1
+#        inputs:
+#          packageFeedSelector: 'nugetOrg'
+#          versionSelector: 'latestStable'
 
-      - task: VisualStudioTestPlatformInstaller@1
-        inputs:
-          packageFeedSelector: 'nugetOrg'
-          versionSelector: 'latestStable'
-      
-      - task: DotNetCoreCLI@2
-        displayName: 'dotnet build'
-        inputs:
-          projects: '**/*.csproj'
-
-      - task: DotNetCoreCLI@2
-        inputs:
-          command: 'test'
-          projects: '**/*Tests/*.csproj'
-
-      - task: VSTest@2
-        inputs:
-          testSelector: 'testAssemblies'
-          testAssemblyVer2: '**/*Test*.dll
-            **/*AcceptanceTest*.dll
-            **/bin/debug/*test*.dll
-            !**/*TestAdapter.dll
-            !**/obj/**'
-          searchFolder: '$(System.DefaultWorkingDirectory)'
-          uiTests: true
-          vsTestVersion: 'toolsInstaller'
-          testRunTitle: 'UITests'
-      
+# deploy build artifacts to dev environment
       - task: AzureRmWebAppDeployment@3
-        displayName: 'Deploy Azure App Service'
+        displayName: 'Deploy Azure App Service to dev'
         inputs:
           azureSubscription: 'CICDserviceConnection'
           WebAppName: 'devCICDonAzure'
@@ -113,17 +95,37 @@ stages:
           UseWebDeploy: true
           RenameFilesFlag: true
 
+# extract files from .zip to be able to build acceptance tests
+      - task: ExtractFiles@1
+        inputs:
+          archiveFilePatterns: '$(System.ArtifactsDirectory)/**/*.zip'
+          destinationFolder: '$(System.DefaultWorkingDirectory)/$(Build.BuildId)'
+          cleanDestinationFolder: false
 
-          
+# build acceptance tests
+      - task: DotNetCoreCLI@2
+        displayName: 'dotnet build'
+        inputs:
+          projects: '**/*.csproj'
+
+# run acceptance tests
+      - task: DotNetCoreCLI@2
+        displayName: 'run acceptance test'
+        inputs:
+          command: 'test'
+          projects: '**/*Tests/*.csproj'
+
+# definition of final stage
 - stage: 'final'
   dependsOn: 'acceptance'
   condition: 'succeeded()'
   jobs:
-      # if dev successfully completes start deployment to prod
     - job: production
       pool:
         vmImage: 'vs2017-win2016'
       steps:
+
+# download build artifacts to deploy them in production environment
       - task: DownloadBuildArtifacts@0
         inputs:
           buildType: 'current'
@@ -131,8 +133,9 @@ stages:
           artifactName: 'drop'
           downloadPath: '$(System.ArtifactsDirectory)'
       
+# deploy build artifacts to production environment
       - task: AzureRmWebAppDeployment@3
-        displayName: 'Deploy Azure App Service'
+        displayName: 'Deploy Azure App Service to production'
         inputs:
           azureSubscription: 'CICDserviceConnection'
           WebAppName: 'CICDonAzure'
