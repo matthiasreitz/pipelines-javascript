@@ -37,7 +37,28 @@ namespace UITests
             }
             catch (AssertFailedException exception)
             {
-                Console.WriteLine(exception.ToString());
+                throw;
+            }
+            finally
+            {
+                driver.Quit();
+            }
+        }
+        [TestMethod]
+        public void TestMethod2()
+        {
+            driver.Navigate().GoToUrl("https://devcicdonazure.azurewebsites.net/");
+
+            IWebElement anzeigeText = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(By.XPath("/html/body")));
+
+            try
+            {
+                System.Threading.Thread.Sleep(5000);
+                Assert.AreEqual(anzeigeText.Text, "Azure Pipelines");
+            }
+            catch (AssertFailedException exception)
+            {
+                throw;
             }
             finally
             {
