@@ -35,6 +35,10 @@ namespace UITests
                 System.Threading.Thread.Sleep(5000);
                 Assert.AreEqual(anzeigeText.Text, "Azure Pipelines");
             }
+            catch (AssertFailedException exception)
+            {
+                Console.WriteLine(exception.ToString());
+            }
             finally
             {
                 driver.Quit();
