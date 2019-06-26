@@ -24,12 +24,6 @@ stages:
           command: 'custom'
           customCommand: 'test'
 
-# needed?
-#      - task: Npm@1
-#        inputs:
-#          command: 'custom'
-#          customCommand: 'build'
-
 # publish tests results to artifact repository
       - task: PublishTestResults@2
         condition: succeededOrFailed()
@@ -77,11 +71,6 @@ stages:
           artifactName: 'drop'
           downloadPath: '$(System.ArtifactsDirectory)'
 
-#      - task: VisualStudioTestPlatformInstaller@1
-#        inputs:
-#          packageFeedSelector: 'nugetOrg'
-#          versionSelector: 'latestStable'
-
 # deploy build artifacts to dev environment
       - task: AzureRmWebAppDeployment@3
         displayName: 'Deploy Azure App Service to dev'
@@ -106,6 +95,7 @@ stages:
       - task: DotNetCoreCLI@2
         displayName: 'dotnet build'
         inputs:
+          command: 'build'
           projects: '**/*.csproj'
 
 # run acceptance tests
