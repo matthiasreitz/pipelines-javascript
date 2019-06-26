@@ -70,12 +70,7 @@ stages:
           downloadType: 'single'
           artifactName: 'drop'
           downloadPath: '$(System.ArtifactsDirectory)'
-# extract files from .zip to be able to build acceptance tests
-      - task: ExtractFiles@1
-        inputs:
-          archiveFilePatterns: '$(System.ArtifactsDirectory)/**/*.zip'
-          destinationFolder: '$(System.DefaultWorkingDirectory)'
-          cleanDestinationFolder: true
+
           
 # deploy build artifacts to dev environment
       - task: AzureRmWebAppDeployment@3
@@ -90,7 +85,12 @@ stages:
           UseWebDeploy: true
           RenameFilesFlag: true
 
-
+# extract files from .zip to be able to build acceptance tests
+      - task: ExtractFiles@1
+        inputs:
+          archiveFilePatterns: '$(System.ArtifactsDirectory)/**/*.zip'
+          destinationFolder: '$(System.DefaultWorkingDirectory)/build'
+          cleanDestinationFolder: true
 
 # build acceptance tests
       - task: DotNetCoreCLI@2
