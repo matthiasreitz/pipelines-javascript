@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
@@ -26,14 +27,23 @@ namespace UITests
         [TestMethod]
         public void TestMethod1()
         {
+            string city = "Essen";
             driver.Navigate().GoToUrl("https://devcicdonazure.azurewebsites.net/");
 
-            IWebElement anzeigeText = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(By.XPath("/html/body")));
+            IWebElement setCity = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(By.XPath("/html/body/div/fieldset/form/input[1]")));
+            setCity.SendKeys(city);
+            setCity.SendKeys(Keys.Enter);
+
+            IWebElement weatherCity = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(By.XPath("/html/body/div/fieldset/p")));
+            
+            string responseCity = weatherCity.Text.Split(' ').Last();
+
+            //anzeigeText = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(By.XPath("/html/body")));
 
             try
             {
                 System.Threading.Thread.Sleep(5000);
-                Assert.AreEqual(anzeigeText.Text, "Azure Pipelines");
+                Assert.AreEqual(city, weatherCity);
             }
             catch (AssertFailedException exception)
             {
@@ -47,14 +57,23 @@ namespace UITests
         [TestMethod]
         public void TestMethod2()
         {
+            string city = "Duisburg";
             driver.Navigate().GoToUrl("https://devcicdonazure.azurewebsites.net/");
 
-            IWebElement anzeigeText = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(By.XPath("/html/body")));
+            IWebElement setCity = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(By.XPath("/html/body/div/fieldset/form/input[1]")));
+            setCity.SendKeys(city);
+            setCity.SendKeys(Keys.Enter);
+
+            IWebElement weatherCity = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(By.XPath("/html/body/div/fieldset/p")));
+
+            string responseCity = weatherCity.Text.Split(' ').Last();
+
+            //anzeigeText = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(By.XPath("/html/body")));
 
             try
             {
                 System.Threading.Thread.Sleep(5000);
-                Assert.AreEqual(anzeigeText.Text, "Azure Pipelines");
+                Assert.AreEqual(city, weatherCity);
             }
             catch (AssertFailedException exception)
             {
