@@ -1,18 +1,16 @@
 {
-  "name": "HelloWorld",
+  "name": "helloworld",
   "private": true,
   "version": "0.0.0",
-  "description": "Hello World",
+  "description": "",
   "main": "server.js",
   "author": {
-    "name": "",
-    "email": ""
+    "name": ""
   },
   "dependencies": {
     "express": "^4.13.3",
     "mocha": "^3.0.0",
     "body-parser": "^1.17.2",
-    "express": "^4.15.3",
     "request": "^2.81.0"
   },
   "devDependencies": {
