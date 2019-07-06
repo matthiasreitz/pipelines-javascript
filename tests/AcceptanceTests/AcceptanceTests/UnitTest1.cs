@@ -43,7 +43,7 @@ namespace UITests
             try
             {
                 System.Threading.Thread.Sleep(5000);
-                Assert.AreEqual(city, weatherCity);
+                Assert.AreEqual(city, responseCity);
             }
             catch (AssertFailedException exception)
             {
@@ -73,7 +73,7 @@ namespace UITests
             try
             {
                 System.Threading.Thread.Sleep(5000);
-                Assert.AreEqual(city, weatherCity);
+                Assert.AreEqual(city, responseCity);
             }
             catch (AssertFailedException exception)
             {
